@@ -1,0 +1,6 @@
+#before changing setting please ensure that .htaccess is allowed in your apache2.conf
+Options +FollowSymlinks
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php/$1 [L] 
