@@ -35,12 +35,12 @@
 			var divi =  document.createElement("div"); divi.setAttribute("id","Daily-Report");
 			var table = document.createElement("table");table.setAttribute("id","datagrid");table.style.whiteSpace = "nowrap";table.style.textAlign = "center";
 			var tableBody = document.createElement("tbody");
-			var headtext = ["First Name ","Last Name ","Date of Birth ","No show ","Date ","Referral "];
+			var headtext = ["First Name ","Last Name ","Date of Birth ","No show ","Date ","Referrer_Agency","Referers","Service type"];
 			var header = document.createElement("tr");
 			header.className = "header";
 			header.style.fontSize = "15px";header.style.background = "#0070A8";
 			
-			for (var i = 0; i < 6; i++) {
+			for (var i = 0; i < 8; i++) {
 			var headercell = document.createElement("th");
 			var headerText = document.createTextNode(headtext[i]);
 			headercell.appendChild(headerText);
@@ -48,26 +48,30 @@
 			}	
 			tableBody.appendChild(header);
 			
-			
+			console.log(GlobalVariables);
 			var appointment = GlobalVariables.appointments;
 			var customers =  GlobalVariables.customers;
-			var row;
+			var row = 0;
 			var rownum = 0;
+	    		var services=["Clothing","Clothing, PNP","Clothing Layette B","Clothing Layette G","Clothing Layette B, PNP","Clothing Layette G, PNP","Maternity Clothing","Others"];
 			$.each(appointment, function(index, a) {
+				console.log(a);
 				var sdt = a.start_datetime.toString('yyyy,MM,dd HH:mm:ss');
 					sdt = new Date(sdt);
-                if (sdt <= start & sdt >= end & serviceId == a.id_services) {
+                			if (sdt <= start & sdt >= end) {
 					$.each(customers, function(index, c) {
+						
 						if(c.id == a.id_users_customer)
 						{
-							var content = [c.first_name,c.last_name,c.dob,a.no_show_flag,a.start_datetime.toString('yyyy/MM/dd')];
+							console.log(c);
+							var content = [c.first_name,c.last_name,c.dob,a.no_show_flag,a.start_datetime.toString('yyyy/MM/dd'),c.agency,c.name,services[a.id_services-3]];
 							row = document.createElement("tr");
 							if(rownum % 2 == 0)
 							{
 								row.className = "alt";
 								row.style.background = "#E1EEF4";
 							}
-							for (var i = 0; i < 5; i++) {
+							for (var i = 0; i < 8; i++) {
 							var cell = document.createElement("td");
 							var cellText = document.createTextNode(content[i]);
 							cell.appendChild(cellText);
@@ -76,10 +80,12 @@
 							rownum = rownum + 1;
 							}
 						}
-					});		
+					});
                 }
             });
-	
+
+
+
 			table.appendChild(tableBody);
 			divi.appendChild(table);
 
@@ -106,69 +112,268 @@
 			}
 			else if($('#monthly-radio-ranged').prop('checked')){
 			end = Date.parseExact($('#monthly-report #start-datetime').val(),
-                    'MM/dd/yyyy').toString('yyyy,MM,dd 23:59:59');
+                    'MM/dd/yyyy').toString('yyyy,MM,dd 00:00:00');
 			end = new Date(end);
 			start = Date.parseExact($('#monthly-report #end-datetime').val(),
-                    'MM/dd/yyyy').toString('yyyy,MM,dd 00:00:00');
+                    'MM/dd/yyyy').toString('yyyy,MM,dd 23:59:59');
 			start= new Date(start);
 			}
+			
 			var serviceId = $('#monthly-report #select-service').val();
+		//Monthly report title
+			var monthNames=["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
+			var title=document.createElement("tr");
+			var titletext=["Month of ", monthNames[end.getMonth()] , end.getFullYear(), "Client report "];
+			var counter = 0;
+			for(counter=0; counter < 4; counter++){
+				var title_cell=document.createElement("th");
+				var title_text=document.createTextNode(titletext[counter]);
+				title_cell.appendChild(title_text);
+				title.appendChild(title_cell);
+			}
 			
 			var divi =  document.createElement("div"); divi.setAttribute("id","Monthly-Report");
 			var table = document.createElement("table");table.setAttribute("id","datagrid");table.style.whiteSpace = "nowrap";table.style.textAlign = "center";
 			var tableBody = document.createElement("tbody");
-			var headtext = ["First Name ","Last Name ","Date of Birth ","No show ","Date ","Referral "];
+			var headtext = ["Clients Seen ","Children ","Layettes ","Pack&Play ","Clients Scheduled ","No Show ", "%No Show "];
 			var header = document.createElement("tr");
 			header.className = "header";
 			header.style.fontSize = "15px";header.style.background = "#0070A8";
-			
-			for (var i = 0; i < 6; i++) {
+			for (var i = 0; i <= 6; i++) {
 			var headercell = document.createElement("th");
 			var headerText = document.createTextNode(headtext[i]);
 			headercell.appendChild(headerText);
 			header.appendChild(headercell);
 			}	
-			tableBody.appendChild(header);
-			
-			
+			tableBody.appendChild(title);
+			tableBody.appendChild(header);	
 			var appointment = GlobalVariables.appointments;
 			var customers =  GlobalVariables.customers;
 			var row;
 			var rownum = 0;
-			$.each(appointment, function(index, a) {
+		//Current Month Statistics
+			 var num_noshow=0;
+			 var total_children=0;
+			 var total_layettes=0;
+			 var percent_noshow=0;
+			 var total_pnp=0;
+			 var total_clients=0;
+			 $.each(appointment,function(index,a) {
 				var sdt = a.start_datetime.toString('yyyy,MM,dd HH:mm:ss');
-					sdt = new Date(sdt);
-					console.log(serviceId,a.id_services);
-                if (sdt <= start & sdt >= end & serviceId == a.id_services) {
-					$.each(customers, function(index, c) {
-						if(c.id == a.id_users_customer)
-						{
-							var content = [c.first_name,c.last_name,c.dob,a.no_show_flag,a.start_datetime.toString('yyyy/MM/dd')];
-							row = document.createElement("tr");
-							if(rownum % 2 == 0)
-							{
-								row.className = "alt";
-								row.style.background = "#E1EEF4";
+				sdt = new Date(sdt);
+                		if (sdt <= start & sdt >= end) { 
+			 		$.each(customers,function(index,c){
+						if(c.id==a.id_users_customer) {
+							total_clients++;
+							if(a.no_show_flag==1){
+								num_noshow++;
 							}
-							for (var i = 0; i < 5; i++) {
-							var cell = document.createElement("td");
-							var cellText = document.createTextNode(content[i]);
-							cell.appendChild(cellText);
-							row.appendChild(cell);
-							tableBody.appendChild(row);
-							rownum = rownum + 1;
+						       	total_children += Number(c.num_of_children);
+							total_layettes+=(Number(a.layette_boy)+Number(a.layette_girl));
+							total_pnp+=Number(a.pnp_qty);
+						}
+					});
+				}
+			}); 
+			var num_showup=total_clients-num_noshow;
+			percent_noshow=(100*num_noshow/total_clients).toFixed(2) + "%";
+			var content=[num_showup,total_children,total_layettes,total_pnp,total_clients,num_noshow,percent_noshow];
+			row = document.createElement("tr");
+			for(var i=0;i<=6;i++){
+				var cell = document.createElement("td");
+				var cellText = document.createTextNode(content[i]);
+				cell.appendChild(cellText);
+				row.appendChild(cell);
+			}
+			tableBody.appendChild(row);
+		//Year-to-date-report tile	
+			var title=document.createElement("tr");
+			var titletext=["Year-To-Date Client Report", start.getFullYear()];
+			var counter = 0;
+			for(counter=0; counter < 2; counter++){
+				var title_cell=document.createElement("th");
+				var title_text=document.createTextNode(titletext[counter]);
+				title_cell.appendChild(title_text);
+				title.appendChild(title_cell);
+			}
+			tableBody.appendChild(title);
+			var header = document.createElement("tr");
+			header.className = "header";
+			header.style.fontSize = "15px";header.style.background = "#0070A8";
+			for (var i = 0; i <= 6; i++) {
+			var headercell = document.createElement("th");
+			var headerText = document.createTextNode(headtext[i]);
+			headercell.appendChild(headerText);
+			header.appendChild(headercell);
+			}
+			tableBody.appendChild(header);
+		//Year-to-date statistic
+			var num_noshow=0;
+			 var total_children=0;
+			 var total_layettes=0;
+			 var percent_noshow=0;
+			 var total_pnp=0;
+			 var total_clients=0;
+			 var start_year=start.getFullYear();
+		 	 var Jan=new Date();
+			 Jan.setFullYear(Number(start_year), 0, 1);
+			 Jan.setHours(0);
+			 Jan.setMinutes(0);
+			 Jan.setSeconds(0);
+			 console.log("Jan",Jan);
+			 console.log("old start",start);
+			 $.each(appointment,function(index,a) {
+				var sdt = a.start_datetime.toString('yyyy,MM,dd HH:mm:ss');
+				sdt = new Date(sdt);
+                		if (sdt <= start & sdt >= Jan) { 
+			 		$.each(customers,function(index,c){
+						if(c.id==a.id_users_customer) {
+							total_clients++;
+							if(a.no_show_flag==1){
+								num_noshow++;
+							}
+						       	total_children += Number(c.num_of_children);
+							total_layettes+=(Number(a.layette_boy)+Number(a.layette_girl));
+							total_pnp+=Number(a.pnp_qty);
+						}
+					});
+				}
+			}); 
+			var num_showup=total_clients-num_noshow;
+			percent_noshow=(100*num_noshow/total_clients).toFixed(2) + "%";
+			var content=[num_showup,total_children,total_layettes,total_pnp,total_clients,num_noshow,percent_noshow];
+			row = document.createElement("tr");
+			for(var i=0;i<=6;i++){
+				var cell = document.createElement("td");
+				var cellText = document.createTextNode(content[i]);
+				cell.appendChild(cellText);
+				row.appendChild(cell);
+			}
+			tableBody.appendChild(row);
+		//Previous Year-to-date report
+		//Previous Year report title
+			var title=document.createElement("tr");
+			var titletext=["Previous Year Report", start.getFullYear()-1];
+			var counter = 0;
+			for(counter=0; counter < 2; counter++){
+				var title_cell=document.createElement("th");
+				var title_text=document.createTextNode(titletext[counter]);
+				title_cell.appendChild(title_text);
+				title.appendChild(title_cell);
+			}
+			tableBody.appendChild(title);
+			var header = document.createElement("tr");
+			header.className = "header";
+			header.style.fontSize = "15px";header.style.background = "#0070A8";
+			for (var i = 0; i <= 6; i++) {
+			var headercell = document.createElement("th");
+			var headerText = document.createTextNode(headtext[i]);
+			headercell.appendChild(headerText);
+			header.appendChild(headercell);
+			}
+			tableBody.appendChild(header);
+		//Previous Year Statistics(Both "start" and Jan are set to one year earlier. They will be reset to curret year later)
+			var num_noshow=0;
+			 var total_children=0;
+			 var total_layettes=0;
+			 var percent_noshow=0;
+			 var total_pnp=0;
+			 var total_clients=0;
+		         var start_year=start.getFullYear();
+		 	// var Jan=new Date();
+			 start.setFullYear(Number(start_year)-1);
+			 console.log("start",start);
+			 Jan.setFullYear(Number(start_year)-1);
+			 console.log("Jan",Jan);
+			 $.each(appointment,function(index,a) {
+				var sdt = a.start_datetime.toString('yyyy,MM,dd HH:mm:ss');
+				sdt = new Date(sdt);
+                		if (sdt <= start & sdt >= Jan) { 
+			 		$.each(customers,function(index,c){
+						if(c.id==a.id_users_customer) {
+							total_clients++;
+							if(a.no_show_flag==1){
+								num_noshow++;
+							}
+						       	total_children += Number(c.num_of_children);
+							total_layettes+=(Number(a.layette_boy)+Number(a.layette_girl));
+							total_pnp+=Number(a.pnp_qty);
+						}
+					});
+				}
+			}); 
+			var num_showup=total_clients-num_noshow;
+			percent_noshow=(100*num_noshow/total_clients).toFixed(2) + "%";
+			var content=[num_showup,total_children,total_layettes,total_pnp,total_clients,num_noshow,percent_noshow];
+			row = document.createElement("tr");
+			for(var i=0;i<=6;i++){
+				var cell = document.createElement("td");
+				var cellText = document.createTextNode(content[i]);
+				cell.appendChild(cellText);
+				row.appendChild(cell);
+			}
+			tableBody.appendChild(row);
+		//Current Month Referring Agency
+		 	var agencies=[];
+			var times=[];
+			start.setFullYear(Number(start_year));
+			console.log("new start",start);
+			console.log("end",end);
+			$.each(appointment,function(index,a) {
+				var sdt = a.start_datetime.toString('yyyy,MM,dd HH:mm:ss');
+				sdt = new Date(sdt);
+                		if (sdt <= start & sdt >= end) {
+					$.each(customers,function(index,c){
+						if(c.id==a.id_users_customer) {
+							if(agencies.includes(c.agency)){
+								times[agencies.indexOf(c.agency)]++;
+							}
+							else{
+								agencies.push(c.agency);
+								times[agencies.indexOf(c.agency)]=1;
 							}
 						}
-					});		
-                }
-            });
-	
+					})
+				}
+			})
+			console.log("agencies",agencies);
+			console.log("times",times);
+			var title=document.createElement("tr");
+			var titletext=["Month of ", monthNames[end.getMonth()] , end.getFullYear(), "Agency report "];
+			var counter = 0;
+			for(counter=0; counter < 4; counter++){
+				var title_cell=document.createElement("th");
+				var title_text=document.createTextNode(titletext[counter]);
+				title_cell.appendChild(title_text);
+				title.appendChild(title_cell);
+			}
+			tableBody.appendChild(title);
+			var i=agencies.length;
+			console.log("i",i);
+			for(counter=0; counter<i; counter++){
+				var row = document.createElement("tr");
+				if(rownum % 2 == 0){
+					row.className = "alt";
+					row.style.background = "#E1EEF4";
+				}
+				for (var j = 0; j < 2; j++) {
+					var cell = document.createElement("td");
+					if(j==0){
+						cellText=document.createTextNode(agencies[counter]);		
+					}else{
+						cellText=document.createTextNode(times[counter]);
+					}
+					cell.appendChild(cellText);
+					row.appendChild(cell);
+				}
+			//	row.appendChild(cell);
+				tableBody.appendChild(row);
+				rownum ++;
+			}
+		//Previous Month Referring Agency
 			table.appendChild(tableBody);
-			divi.appendChild(table);
-
+			divi.appendChild(table);			
 			var printWin = window.open('', '', 'left=0,top=0,width=700,height=500,toolbar=0,scrollbars=0,status  =0');
-			//printWin.document.write(html);
-
 			printWin.document.body.appendChild(divi);
     });
 	$('#generate-noshow').click(function() {

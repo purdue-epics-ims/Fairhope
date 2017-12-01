@@ -327,12 +327,25 @@ class Customers_Model extends CI_Model {
         }
         
         $this->db->where('id_roles', $customers_role_id);
-        
+        /*
+	 $query=$this->db->query("select *, count(ea_users.num_noshow) as total from ea_users where ea_users.num_noshow=1)
+	 */
         return $this->db
-                    ->select('*')
-                    ->from('ea_users')
-                    ->order_by('last_name')
-                    ->order_by('first_name')
+	//	->select('*','count(ea_users.num_noshow) where ea_users.num_noshow=1 as total')
+		->select('*')
+	//	->select('count(ea_users.num_noshow) where ea_users.num_noshow=1 as total')	
+    	//	->count_all
+			->from('ea_users')
+		    ->join('fairhope_referrers','ea_users.id_referrer=fairhope_referrers.id_referrer')
+		    ->order_by('last_name')
+		    ->order_by('first_name')
+		    
+/*		    union all 
+		    ->select('count(num_noshow) where num_noshow=1 as total')
+		    ->from('ea_users')
+		    ->where('num_noshow',1)
+ 	             
+ */
                     ->get()->result_array();
     }
     

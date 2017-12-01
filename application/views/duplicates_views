@@ -1,0 +1,68 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
+
+class Customers_Model extends CI_Model {
+    /**
+     * Class Constructor
+     */
+    public function __construct() {
+        parent::__construct();
+    }
+    
+    /**
+     * Add a customer record to the database.
+     * 
+     */
+    public function exists($customer) {
+        // Validate the customer data before doing anything.
+        $this->validate($customer);
+
+        // :: CHECK IF CUSTOMER ALREADY EXIST (FROM NAME & DOB).	
+        if ( $this->exists($customer) && !isset($customer['id'])) {
+            throw new Exception('Duplicate client: A client with similar first name, last name, and DOB exists in the database, do you want to merge them?.');
+        // Find the customer id from the database.
+			$customer['id'] = $this->find_record_id($customer);
+		// Display results from the search
+			echo "id: " . $row["id"]. " - Name: " . $row["firstname"]. " " . $row["lastname"]. 
+        }
+	}
+	
+	//once validation is complete
+
+	public function exists($customer) {
+        // to search for duplicate clients.
+        if (!isset($customer['first_name']) && !isset($customer['last_name']) && !isset($customer['dob'])) {
+            throw new Exception('the displayed potential are duplicate clinets');
+			
+		
+        }
+
+        // Search for customer in DB
+        $num_rows = $this->db
+                ->select('*')
+                ->from('ea_users')
+                ->join('ea_roles', 'ea_roles.id = ea_users.id_roles', 'inner')
+                ->where('ea_users.last_name', $customer['last_name'])
+                ->where('ea_users.first_name', $customer['first_name'])
+                ->where('ea_users.dob', $customer['dob'])
+                ->where('ea_roles.slug', DB_SLUG_CUSTOMER)
+                ->get()->num_rows();
+
+        return ($num_rows > 0) ? TRUE : FALSE;
+		//pulls data from mysql
+		
+		echo($customer)
+    }
+	
+<input type="button"  value="Merge"  onclick="run_script();"/>
+
+<script>
+function run_()
+{
+    $.post("duplicates.php",function(data){
+        if(data != null)
+        {
+            alert(data);
+        }   
+     });
+}
+</script>

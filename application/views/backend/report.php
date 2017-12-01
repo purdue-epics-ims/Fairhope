@@ -14,7 +14,7 @@ date_default_timezone_set('America/Chicago');
 <script type="text/javascript" 
         src="<?php echo $base_url; ?>assets/js/libs/jquery/fullcalendar.min.js"></script>
 
-        <script type="text/javascript" 
+<script type="text/javascript" 
         src="<?php echo $base_url; ?>assets/js/libs/jquery/jquery-ui-timepicker-addon.js"></script>
 <script type="text/javascript">    
     var GlobalVariables = {
@@ -23,8 +23,9 @@ date_default_timezone_set('America/Chicago');
         'baseUrl'               : <?php echo '"' . $base_url . '"'; ?>,
         'appointments'           : <?php echo json_encode($appointments); ?>,
         'customers'             : <?php echo json_encode($customers); ?>,
-        'secretaryProviders'    : <?php echo json_encode($secretary_providers); ?>,
-        'user'                  : {
+
+	'secretaryProviders'    : <?php echo json_encode($secretary_providers); ?>,
+	'user'                  : {
             'id'        : <?php echo $user_id; ?>,
             'email'     : <?php echo '"' . $user_email . '"'; ?>,
             'role_slug' : <?php echo '"' . $role_slug . '"'; ?>,
@@ -71,63 +72,7 @@ date_default_timezone_set('America/Chicago');
                                       Date: <input type="text" id="start-datetime" class="hasDatepicker">
                                     </label>
 									
-								  <select id="select-service">
-                            <?php 
-                                // Group services by category, only if there is at least one service 
-                                // with a parent category.
-                                foreach($available_services as $service) {
-                                    if ($service['category_id'] != NULL) {
-                                        $has_category = TRUE;
-                                        break;
-                                    }
-                                }
-                                
-                                if ($has_category) {
-                                    $grouped_services = array();
-
-                                    foreach($available_services as $service) {
-                                        if ($service['category_id'] != NULL) {
-                                            if (!isset($grouped_services[$service['category_name']])) {
-                                                $grouped_services[$service['category_name']] = array();
-                                            }
-
-                                            $grouped_services[$service['category_name']][] = $service;
-                                        } 
-                                    }
-
-                                    // We need the uncategorized services at the end of the list so
-                                    // we will use another iteration only for the uncategorized services.
-                                    $grouped_services['uncategorized'] = array();
-                                    foreach($available_services as $service) {
-                                        if ($service['category_id'] == NULL) {
-                                            $grouped_services['uncategorized'][] = $service;
-                                        }
-                                    }
-
-                                    foreach($grouped_services as $key => $group) {
-                                        $group_label = ($key != 'uncategorized')
-                                                ? $group[0]['category_name'] : 'Uncategorized';
-                                        
-                                        if (count($group) > 0) {
-                                            echo '<optgroup label="' . $group_label . '">';
-                                            foreach($group as $service) {
-                                                echo '<option value="' . $service['id'] . '">' 
-                                                    . $service['name'] . '</option>';
-                                            }
-                                            echo '</optgroup>';
-                                        }
-                                    }
-                                }  
-								else {
-										foreach($available_services as $service) {
-                                        echo '<option value="' . $service['id'] . '">' 
-                                                    . $service['name'] . '</option>';
-										}
-									}
-									?>
-								</select>
-                                  </div>
-                                </div>
+								  
 
                                 <!-- Button -->
                                 <div class="control-group">
@@ -172,64 +117,7 @@ date_default_timezone_set('America/Chicago');
                                   <input type="radio" name="radios" id="monthly-radio-ranged" value="Range">
                                   Date Range <input type="text" id="start-datetime" class="hasDatepicker"> to <input type="text" id="end-datetime" class="hasDatepicker">
                                 </label>
-								<select id="select-service">
-                            <?php 
-                                // Group services by category, only if there is at least one service 
-                                // with a parent category.
-                                foreach($available_services as $service) {
-                                    if ($service['category_id'] != NULL) {
-                                        $has_category = TRUE;
-                                        break;
-                                    }
-                                }
-                                
-                                if ($has_category) {
-                                    $grouped_services = array();
-
-                                    foreach($available_services as $service) {
-                                        if ($service['category_id'] != NULL) {
-                                            if (!isset($grouped_services[$service['category_name']])) {
-                                                $grouped_services[$service['category_name']] = array();
-                                            }
-
-                                            $grouped_services[$service['category_name']][] = $service;
-                                        } 
-                                    }
-
-                                    // We need the uncategorized services at the end of the list so
-                                    // we will use another iteration only for the uncategorized services.
-                                    $grouped_services['uncategorized'] = array();
-                                    foreach($available_services as $service) {
-                                        if ($service['category_id'] == NULL) {
-                                            $grouped_services['uncategorized'][] = $service;
-                                        }
-                                    }
-
-                                    foreach($grouped_services as $key => $group) {
-                                        $group_label = ($key != 'uncategorized')
-                                                ? $group[0]['category_name'] : 'Uncategorized';
-                                        
-                                        if (count($group) > 0) {
-                                            echo '<optgroup label="' . $group_label . '">';
-                                            foreach($group as $service) {
-                                                echo '<option value="' . $service['id'] . '">' 
-                                                    . $service['name'] . '</option>';
-                                            }
-                                            echo '</optgroup>';
-                                        }
-                                    }
-                                }  
-								else {
-										foreach($available_services as $service) {
-                                        echo '<option value="' . $service['id'] . '">' 
-                                                    . $service['name'] . '</option>';
-										}
-									}
-									?>
-								</select>
-                              </div>
-                            </div>
-
+								
 
                             <!-- Button -->
                             <div class="control-group">
